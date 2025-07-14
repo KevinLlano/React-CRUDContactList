@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getContact } from '../api/ContactService.js';
+import { getContact, updateContactImage } from '../api/ContactService.js';
 import { toastError, toastSuccess } from '../api/ToastService.js';
 
 const ContactDetail = ({ updateContact }) => {
@@ -18,7 +18,7 @@ const ContactDetail = ({ updateContact }) => {
 
   const { id } = useParams();
 
-  // Fetch contact from backend
+  // Fetch contact from local storage
   const fetchContact = async (id) => {
     try {
       const { data } = await getContact(id);
@@ -34,43 +34,20 @@ const ContactDetail = ({ updateContact }) => {
     inputRef.current.click();
   };
 
-  // Handle image upload
+  // Handle image upload using the updated ContactService
   const updateImageHandler = async (file) => {
+    if (!file) return;
+    
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('id', contact.id); // Send contact ID with the image file
+    formData.append('id', contact.id);
 
     try {
-      // Sending PUT request to upload the image to backend
-      const response = await fetch('http://localhost:8080/contacts/photo', { // Ensure this URL is correct for your backend
-        method: 'PUT',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload photo');
-      }
-
-      // Attempt to parse JSON; fall back if not valid JSON
-      let result;
-      try {
-        result = await response.json();
-      } catch (error) {
-        result = { success: true }; // Assume success if no JSON returned
-      }
-
-      if (result.success) {
-        // Directly update the photoUrl with the new image path
-        const newPhotoUrl = `/contacts/image/${file.name}`; // Update as per backend's file naming convention
-        setContact((prev) => ({
-          ...prev,
-          photoUrl: newPhotoUrl,
-        }));
-        toastSuccess('Photo updated');
-      } else {
-        toastError('Failed to upload photo');
-      }
+      const { data } = await updateContactImage(formData);
+      setContact(data);
+      toastSuccess('Photo updated successfully');
     } catch (error) {
+      console.log(error);
       toastError(error.message);
     }
   };

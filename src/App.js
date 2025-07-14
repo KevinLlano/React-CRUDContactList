@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header.js';
 import ContactList from './components/ContactList.js';
-import { getContacts, saveContact, updateContactImage } from './api/ContactService.js';
+import { getContacts, saveContact, updateContactImage, clearAndReinitializeData } from './api/ContactService.js';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ContactDetail from './components/ContactDetail.js';
 import { toastError, toastSuccess } from './api/ToastService.js';
@@ -62,7 +62,8 @@ function App() {
       setFile(undefined);
       fileRef.current.value = null;
       setValues({ name: '', email: '', phone: '', address: '', title: '', status: '' });
-      getAllContacts();
+      await getAllContacts();
+      toastSuccess('Contact created successfully!');
     } catch (error) {
       console.log(error);
       toastError(error.message);
@@ -74,6 +75,7 @@ function App() {
     try {
       const { data } = await saveContact(contact);
       console.log(data);
+      toastSuccess('Contact updated successfully!');
     } catch (error) {
       console.log(error);
       toastError(error.message);
@@ -84,7 +86,7 @@ function App() {
   const updateImage = async (formData) => {
     try {
       await updateContactImage(formData);
-      toastSuccess('Image Updated!');
+      toastSuccess('Photo updated successfully!');
     } catch (error) {
       console.log(error);
       toastError(error.message);
@@ -95,6 +97,8 @@ function App() {
 
   // Fetch contacts on component mount
   useEffect(() => {
+    // Uncomment the next line if you want to reset data (for development)
+    // clearAndReinitializeData();
     getAllContacts();
   }, []);
 
