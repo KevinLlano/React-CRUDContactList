@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/Header.js';
 import ContactList from './components/ContactList.js';
-import { getContacts, saveContact, updateContactImage, clearAndReinitializeData } from './api/ContactService.js';
+import { getContacts, saveContact, updateContactImage } from './api/ContactService.js';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ContactDetail from './components/ContactDetail.js';
 import { toastError, toastSuccess } from './api/ToastService.js';
@@ -97,8 +97,6 @@ function App() {
 
   // Fetch contacts on component mount
   useEffect(() => {
-    // Uncomment the next line if you want to reset data (for development)
-    // clearAndReinitializeData();
     getAllContacts();
   }, []);
 
